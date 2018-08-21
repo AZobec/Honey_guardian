@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #################################################
 #       Author : ARNAUD ZOBEC                   #
 #       date : 21.08.2018                       #
@@ -24,7 +25,7 @@ import sys
 malicious_backup = "/opt/honey_guardian/malicious_folder/"
 watched_folder = ""
 watched_md5sum = "/opt/honey_guardian/resources/www-md5sum.db"
-
+log_output = "/var/ossec/logs/alerts/alerts.json"
 def md5Checksum(filePath):
     with open(filePath, 'rb') as fh:
         m = hashlib.md5()
@@ -43,12 +44,22 @@ def md5Checksum(filePath):
 # and restore old backups
 #
 def threaded_function(event_name, event_pathname, event_md5sum, actual_time):
+    sys.stdout = open(log_output, 'a')
+    copy_done = True
+
+    if os.path.isfile(event_pathname):
+        pass
+    else:
+        sys.exit()
     #### THREADING IS RUNNING ####
+    
     flag_done=False
-    copy_done=False
     #Firt of all - create a copy of file in malicious_folder
     copydst = malicious_backup + event_name +"_"+event_md5sum
-    copyfile(event_pathname, copydst)
+    try:
+        copyfile(event_pathname, copydst)
+    except:
+        exit
     #copy_done=True
     #Second step - kill a possible execution of it and notify it
     out = check_output(["ps", "-ef"])
@@ -122,7 +133,8 @@ def threaded_function(event_name, event_pathname, event_md5sum, actual_time):
 
 def my_callback(evt):
     actual_time = time.time()
-    event_md5sum = md5Checksum(evt.pathname) 
+    event_md5sum = md5Checksum(evt.pathname)
+    sleep(1)
     thread = Thread(target = threaded_function, args=[evt.name,evt.pathname,event_md5sum,actual_time])
     try:
         #Thread is called to wait for process to be activated, and then killed
