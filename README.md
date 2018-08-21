@@ -24,6 +24,6 @@ find /tmp/testfolder/ -type f -exec md5sum '{}' \; > /opt/honey_guardian/resourc
 ### safe backup ###
 Make sure to create a safe backup used to restore modified files:
 cp -R /tmp/testfolder /opt/honey_guardian/resources/safe_backup
-
+Don't forget to keep the same directory tree as root (because it's badly coded, sorry)
 
 
