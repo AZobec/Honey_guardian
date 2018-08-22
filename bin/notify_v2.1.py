@@ -26,6 +26,7 @@ malicious_backup = "/opt/honey_guardian/malicious_folder/"
 watched_folder = ""
 watched_md5sum = "/opt/honey_guardian/resources/www-md5sum.db"
 log_output = "/var/ossec/logs/alerts/alerts.json"
+
 def md5Checksum(filePath):
     with open(filePath, 'rb') as fh:
         m = hashlib.md5()
@@ -52,7 +53,10 @@ def threaded_function(event_name, event_pathname, actual_time):
     else:
         sys.exit()
     #### THREADING IS RUNNING ####
-    event_md5sum = md5Checksum(event_pathname)
+    try:
+	event_md5sum = md5Checksum(event_pathname)
+    except:
+	sys.exit()
     flag_done=False
     #Firt of all - create a copy of file in malicious_folder
     copydst = malicious_backup + event_name +"_"+event_md5sum
