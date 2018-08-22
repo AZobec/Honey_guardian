@@ -43,7 +43,7 @@ def md5Checksum(filePath):
 # and backup files
 # and restore old backups
 #
-def threaded_function(event_name, event_pathname, event_md5sum, actual_time):
+def threaded_function(event_name, event_pathname, actual_time):
     sys.stdout = open(log_output, 'a')
     copy_done = True
 
@@ -52,7 +52,7 @@ def threaded_function(event_name, event_pathname, event_md5sum, actual_time):
     else:
         sys.exit()
     #### THREADING IS RUNNING ####
-    
+    event_md5sum = md5Checksum(event_pathname)
     flag_done=False
     #Firt of all - create a copy of file in malicious_folder
     copydst = malicious_backup + event_name +"_"+event_md5sum
@@ -133,9 +133,9 @@ def threaded_function(event_name, event_pathname, event_md5sum, actual_time):
 
 def my_callback(evt):
     actual_time = time.time()
-    event_md5sum = md5Checksum(evt.pathname)
+    #event_md5sum = md5Checksum(evt.pathname)
     sleep(1)
-    thread = Thread(target = threaded_function, args=[evt.name,evt.pathname,event_md5sum,actual_time])
+    thread = Thread(target = threaded_function, args=[evt.name,evt.pathname,actual_time])
     try:
         #Thread is called to wait for process to be activated, and then killed
         thread.start()
